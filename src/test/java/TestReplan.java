@@ -1,4 +1,3 @@
-import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
 import utils.RegistrationByCardInfo;
 import utils.RegistrationDataGenerator;
@@ -12,7 +11,7 @@ import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
-public class TestReplanAndIbank {
+public class TestReplan {
 
     @Test
     public void testCardDelivery() {
