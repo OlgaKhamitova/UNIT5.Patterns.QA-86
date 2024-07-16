@@ -1,4 +1,6 @@
+import com.codeborne.selenide.Condition;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 import utils.RegistrationByCardInfo;
 import utils.RegistrationDataGenerator;
 
@@ -15,20 +17,26 @@ public class TestReplan {
 
     @Test
     public void testCardDelivery() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate date = LocalDate.now().plusDays(10);
+        int initialDaysToWait = 10;
+        String replanDate = RegistrationDataGenerator.generateRegistrationDate(initialDaysToWait + 1);
         RegistrationByCardInfo generatedData = RegistrationDataGenerator.generateByCard();
 
         open("http://localhost:9999/");
         $("[data-test-id=city] input").setValue(generatedData.getCity());
-        $("[data-test-id=date] input").setValue(String.valueOf(generatedData.getRegistrationDate()));
-        $("[data-test-id=name] input").setValue(generatedData.getName());
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        $("[data-test-id=date] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id=date] input").setValue(RegistrationDataGenerator.generateRegistrationDate(initialDaysToWait));
+        $("[data-test-id=name] input").setValue(generatedData.getName() + " " + generatedData.getLastName());
         $("[data-test-id=phone] input").setValue(generatedData.getPhoneNumber());
         $("[data-test-id=agreement]").click();
         $(withText("Запланировать")).click();
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        $("[data-test-id=date] input").sendKeys(Keys.BACK_SPACE);
+        $("[data-test-id=date] input").setValue(replanDate);
         $(withText("Запланировать")).click();
         $("[data-test-id=replan-notification]").shouldBe(visible, Duration.ofSeconds(15));
         $(withText("Перепланировать")).click();
-        $("[data-test-id=success-notification] .notification__title").shouldBe(hidden, Duration.ofSeconds(15));
+        $("[data-test-id=success-notification] .notification__title").shouldBe(visible, Duration.ofSeconds(15));
+        $("[data-test-id=success-notification] .notification__content").shouldHave(Condition.exactText("Встреча успешно запланирована на " + replanDate));
     }
 }
